@@ -1,0 +1,38 @@
+﻿@model IEnumerable<PersonalFinanceTracker.Models.Income>
+
+@{
+    ViewData["Title"] = "Income List";
+}
+
+<h3>Income List</h3>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add New Income</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model)
+        {
+            <tr>
+                <td>@item.Amount</td>
+                <td>@item.Date.ToShortDateString()</td>
+                <td>@item.Description</td>
+                <td>@item.Category</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
