@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using PersonalFinanceTracker.Models;
 
 namespace PersonalFinanceTracker.Controllers
 {
+    //[Authorize]
     public class IncomeController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
@@ -24,6 +26,7 @@ namespace PersonalFinanceTracker.Controllers
             var incomes = await _dbContext.Incomes
                 .Include(i => i.Category)
                 .Where(i => i.UserId == userId)
+                .OrderByDescending(i => i.Date)
                 .ToListAsync();
             return View(incomes);
         }
@@ -31,7 +34,7 @@ namespace PersonalFinanceTracker.Controllers
 
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_dbContext.Categories, "Id", "Name");
+            LoadCategories();
             return View();
         }
 
@@ -41,14 +44,16 @@ namespace PersonalFinanceTracker.Controllers
         {
             if(ModelState.IsValid)
             {
-                income.UserId = _userManager.GetUserId(User);
-                _dbContext.Add(income);
-                await _dbContext.SaveChangesAsync();
-                return RedirectToAction("Index");
+                LoadCategories();
+                return View(income);
             }
 
-            ViewData["CategoryId"] = new SelectList(_dbContext.Categories, "Id", "Name", income.CategoryId);
-            return View(income);
+            
+            income.UserId = _userManager.GetUserId(User);
+            _dbContext.Incomes.Add(income);
+            await _dbContext.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
 
@@ -60,7 +65,7 @@ namespace PersonalFinanceTracker.Controllers
             if (income == null || income.UserId != _userManager.GetUserId(User))
                 return NotFound();
 
-            ViewData["CategoryId"] = new SelectList(_dbContext.Categories, "Id", "Name", income.CategoryId);
+            LoadCategories(); 
             return View(income);
         }
 
@@ -71,24 +76,22 @@ namespace PersonalFinanceTracker.Controllers
         {
             if (id != income.Id) return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    income.UserId = _userManager.GetUserId(User);
-                    _dbContext.Update(income);
-                    await _dbContext.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!IncomeExists(income.Id)) return NotFound();
-                    else throw;
-                }
-                return RedirectToAction(nameof(Index));
+                LoadCategories();
+                return View(income);
             }
 
-            ViewData["CategoryId"] = new SelectList(_dbContext.Categories, "Id", "Name", income.CategoryId);
-            return View(income);
+            var userId = _userManager.GetUserId(User);
+            var existing = await _dbContext.Incomes.AsNoTracking().FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
+
+            if (existing == null) return NotFound();
+
+            income.UserId = userId;
+            _dbContext.Update(income);
+            await _dbContext.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
 
@@ -96,9 +99,10 @@ namespace PersonalFinanceTracker.Controllers
         {
             if (id == null) return NotFound();
 
+            var userId = _userManager.GetUserId(User);
             var income = await _dbContext.Incomes
                 .Include(i => i.Category)
-                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == _userManager.GetUserId(User));
+                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == userId);
 
             if (income == null) return NotFound();
 
@@ -110,17 +114,22 @@ namespace PersonalFinanceTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var income = await _dbContext.Incomes.FindAsync(id);
-            if (income != null && income.UserId == _userManager.GetUserId(User))
-            {
-                _dbContext.Incomes.Remove(income);
-                await _dbContext.SaveChangesAsync();
-            }
+            var userId = _userManager.GetUserId(User);
+            var income = await _dbContext.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
+
+            if (income == null) return NotFound();
+
+            _dbContext.Incomes.Remove(income);
+            await _dbContext.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
-        private bool IncomeExists(int id) =>
-            _dbContext.Incomes.Any(e => e.Id == id);
 
+        // Helper to load categories for dropdown
+        private void LoadCategories()
+        {
+            ViewBag.Categories = new SelectList(_dbContext.Categories.OrderBy(c => c.Name), "Id", "Name");
+        }
     }
 }

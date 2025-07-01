@@ -12,8 +12,8 @@ using PersonalFinanceTracker.Data;
 namespace PersonalFinanceTracker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250629123454_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250701122858_FinanceTracker")]
+    partial class FinanceTracker
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -1,12 +1,15 @@
 ﻿@model PersonalFinanceTracker.Models.Income
 
 @{
-    ViewData["Title"] = "Add Income";
+    ViewData["Title"] = "Edit Income";
 }
 
-<h3>Add Income</h3>
+<h3>Edit Income</h3>
 
-<form asp-action="Create" method="post">
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+
     <div class="form-group">
         <label asp-for="Amount"></label>
         <input asp-for="Amount" class="form-control" />
@@ -27,12 +30,12 @@
 
     <div class="form-group">
         <label asp-for="CategoryId"></label>
-        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-control">
+        <select asp-for="CategoryId" asp-items="ViewBag.CategoryId" class="form-control">
             <option value="">-- Select --</option>
         </select>
         <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-success">Save</button>
+    <button type="submit" class="btn btn-success">Update</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>

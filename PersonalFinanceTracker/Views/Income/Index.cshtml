@@ -24,10 +24,10 @@
         @foreach(var item in Model)
         {
             <tr>
-                <td>@item.Amount</td>
+                <td>@item.Amount.ToString("C")</td>
                 <td>@item.Date.ToShortDateString()</td>
                 <td>@item.Description</td>
-                <td>@item.Category</td>
+                <td>@item.Category?.Name</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
                     <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
