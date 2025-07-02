@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using PersonalFinanceTracker.Models;
 
 namespace PersonalFinanceTracker.Controllers
 {
+    [Authorize]
     public class ExpenseController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
@@ -42,7 +44,7 @@ namespace PersonalFinanceTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Expense expense)
         {
-            if(!ModelState.IsValid)
+            if(ModelState.IsValid)
             {
                 LoadCategories();
                 return View(expense);
@@ -73,7 +75,7 @@ namespace PersonalFinanceTracker.Controllers
         {
             if (id != expense.Id) return NotFound();
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 LoadCategories();
                 return View(expense);

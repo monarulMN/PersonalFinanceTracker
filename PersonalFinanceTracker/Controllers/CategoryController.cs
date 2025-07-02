@@ -12,9 +12,9 @@ namespace PersonalFinanceTracker.Controllers
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public CategoryController(ApplicationDbContext context)
+        public CategoryController(ApplicationDbContext dbContext)
         {
-            _dbContext = context;
+            _dbContext = dbContext;
         }
 
         // GET: /Category

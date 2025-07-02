@@ -8,7 +8,7 @@ using PersonalFinanceTracker.Models;
 
 namespace PersonalFinanceTracker.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class IncomeController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
@@ -76,7 +76,7 @@ namespace PersonalFinanceTracker.Controllers
         {
             if (id != income.Id) return NotFound();
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 LoadCategories();
                 return View(income);
@@ -95,7 +95,7 @@ namespace PersonalFinanceTracker.Controllers
         }
 
 
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
             if (id == null) return NotFound();
 

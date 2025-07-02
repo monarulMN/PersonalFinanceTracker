@@ -6,7 +6,7 @@
     <title>@ViewData["Title"] - PersonalFinanceTracker</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/PersonalFinanceTracker.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/PersonalFinanceTracker.styles.css" asp-append-version="true" />    
 </head>
 <body>
     <header>
@@ -28,8 +28,17 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Expense" asp-action="Index">Expense</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Category" asp-action="Index">Category</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                        </li>
+
                     </ul>
                 </div>
+                <partial name="_LoginPartial" />
             </div>
         </nav>
     </header>
